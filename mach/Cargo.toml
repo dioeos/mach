@@ -1,0 +1,11 @@
+[package]
+name = "mach"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+global-hotkey = "0.7.0"
+egui = "0.31.1"
+eframe = "0.31.1"
+winit = "0.28"
+crossbeam-channel = "0.5.15"
