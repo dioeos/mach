@@ -1,76 +1,104 @@
-use eframe::{
-    self, App, CreationContext, Frame, NativeOptions, WindowBuilderHook,
-    egui::{CentralPanel, ComboBox, PopupCloseBehavior, UiKind::Popup, Vec2, X11WindowType},
-};
-
-use egui::{UiKind, ViewportBuilder, Window, viewport::WindowLevel};
+use anyhow::Result;
+use crossbeam_channel::Receiver;
 use global_hotkey::{
     GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
     hotkey::{Code, HotKey, Modifiers},
 };
-
-use winit::window::WindowBuilder;
-
-use crossbeam_channel::Receiver;
+use winit::{
+    application::ApplicationHandler,
+    dpi::PhysicalSize,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, ControlFlow, EventLoop},
+    window::{Window, WindowAttributes, WindowId},
+};
 
 struct MyApp {
-    hotkey_rx: Receiver<GlobalHotKeyEvent>,
+    window: Option<Window>,
+    visible: bool,
+    hotkey_rx: Option<Receiver<GlobalHotKeyEvent>>,
+    _hk_manager: Option<GlobalHotKeyManager>,
 }
 
 impl MyApp {
-    fn new(hotkey_rx: Receiver<GlobalHotKeyEvent>) -> Self {
-        Self { hotkey_rx }
+    fn new() -> Self {
+        Self {
+            window: None,
+            visible: true,
+            hotkey_rx: None,
+            _hk_manager: None,
+        }
     }
 }
 
-impl App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
-        if let Ok(event) = self.hotkey_rx.try_recv() {
-            if event.id() == HotKey::new(Some(Modifiers::ALT), Code::Slash).id()
-                && event.state() == HotKeyState::Pressed
-            {
-                println!("Alt+N pressed");
+impl ApplicationHandler for MyApp {
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        let attrs = Window::default_attributes()
+            .with_title("Mach")
+            .with_inner_size(PhysicalSize::new(800, 600));
+
+        let win = event_loop
+            .create_window(attrs)
+            .expect("Failed to create window");
+
+        self.window = Some(win);
+
+        let mut manager = GlobalHotKeyManager::new().expect("hotkey init failed");
+        let hk = HotKey::new(Some(Modifiers::CONTROL), Code::Space);
+        manager.register(hk).expect("register failed");
+
+        let rx: Receiver<GlobalHotKeyEvent> = GlobalHotKeyEvent::receiver().clone();
+        println!("===App resumed===");
+        self.hotkey_rx = Some(rx);
+        self._hk_manager = Some(manager);
+    }
+
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        println!("About to wait");
+        if let Some(rx) = &self.hotkey_rx {
+            while let Ok(evt) = rx.try_recv() {
+                if evt.state == HotKeyState::Pressed {
+                    self.visible = !self.visible;
+                    if let Some(win) = &self.window {
+                        win.set_visible(self.visible);
+                    }
+                }
             }
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Hotkey + egui Demo");
-            ui.label("Press Alt + Slash anywhere to see the message in the console.");
-        });
+        // if self.visible {
+        //     if let Some(win) = &self.window {
+        //         println!("Triggered - in plain");
+        //         win.request_redraw();
+        //     }
+        // }
+    }
+
+    fn window_event(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        _window_id: WindowId,
+        event: WindowEvent,
+    ) {
+        match event {
+            WindowEvent::CloseRequested => {
+                println!("Exiting");
+                event_loop.exit();
+            }
+            WindowEvent::Resized(size) => {
+                println!("Resizing");
+            }
+            WindowEvent::RedrawRequested => {
+                println!("Redraw");
+            }
+            _ => {}
+        }
     }
 }
 
-fn main() -> Result<(), eframe::Error> {
-    let manager = GlobalHotKeyManager::new().unwrap();
-    let hk = HotKey::new(Some(Modifiers::ALT), Code::Slash);
-    manager.register(hk).unwrap();
-
-    println!("Registered hotkeyts... launching GUI now!");
-
-    let hotkey_rx: Receiver<GlobalHotKeyEvent> = GlobalHotKeyEvent::receiver().clone();
-
-    let viewport = ViewportBuilder {
-        inner_size: Some(Vec2::new(800.0, 600.0)),
-        min_inner_size: Some(Vec2::new(800.0, 600.0)),
-        max_inner_size: Some(Vec2::new(800.0, 600.0)),
-        resizable: Some(false),
-        fullscreen: Some(false),
-        maximized: Some(false),
-        decorations: Some(true),
-        window_type: Some(X11WindowType::PopupMenu),
-        window_level: Some(WindowLevel::AlwaysOnTop),
-        ..Default::default()
-    };
-
-    let options = NativeOptions {
-        viewport,
-        centered: true,
-        ..Default::default()
-    };
-
-    eframe::run_native(
-        "Mach",
-        options,
-        Box::new(move |_cc: &CreationContext<'_>| Ok(Box::new(MyApp::new(hotkey_rx.clone())))),
-    )
+fn main() -> Result<()> {
+    let mut my_app = MyApp::new();
+    let event_loop = EventLoop::new()?;
+    event_loop.set_control_flow(ControlFlow::Wait);
+    event_loop.run_app(&mut my_app)?;
+    Ok(())
 }
