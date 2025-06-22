@@ -1,12 +1,12 @@
 [package]
-name = "mach"
+name = "slint-rust-template"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-global-hotkey = "0.7.0"
-egui = "0.31.1"
-eframe = "0.31.1"
-winit = "0.30.11"
-crossbeam-channel = "0.5.15"
-anyhow = "1.0.98"
+slint = "1.8.0"
+
+[build-dependencies]
+slint-build = "1.8.0"
