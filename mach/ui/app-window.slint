@@ -1,18 +1,68 @@
-import { Button, VerticalBox } from "std-widgets.slint";
+import { Button, ScrollView, VerticalBox, HorizontalBox, LineEdit, ListView } from "std-widgets.slint";
+
+struct Macro {
+  keys_ui: string,
+  action_ui: string,
+}
+
+component Macro inherits Rectangle {
+  in property<string> text;
+  in property<string> description;
+  // background: #f0f0f0;
+
+  Rectangle {
+    width: parent.width;
+    height: parent.height;
+    Text {
+      text: root.text + " - " + root.description;
+      horizontal-alignment: center;
+      vertical-alignment: center;
+    }
+  }
+}
 
 export component AppWindow inherits Window {
-    in-out property <int> counter: 42;
-    callback request-increase-value();
-    VerticalBox {
-        Text {
-            text: "Counter: \{root.counter}";
-        }
 
-        Button {
-            text: "Increase value";
-            clicked => {
-                root.request-increase-value();
-            }
+
+    // in property <[Macro]> macros: [
+    //   {title: "Hello", description: "World!"},
+    //   {title: "Bye", description: "World!"}
+    // ];
+
+    in-out property <[Macro]> macros;
+
+
+    width: 1020px;
+    height: 900px;
+    title: "Mach";
+    in-out property<string> search_text;
+    VerticalBox {
+      width: parent.width;
+      height: parent.height;
+      spacing: 8px;
+      padding: 8px;
+      LineEdit {
+        text <=> root.search_text;
+        placeholder-text: "Filter";
+        width: parent.width;
+      }
+      ScrollView {
+        width: parent.width;
+        height: parent.height;
+        Rectangle {
+          VerticalBox {
+          width: parent.width;
+          height: 74px * ceil(root.macros.length / 4);
+          for m[i] in root.macros : Macro {
+            x: mod(i, 4) * 74px;
+            // y: floor(i /4) * 74px;
+            width: 64px;
+            height: 64px;
+            text: m.keys_ui;
+            description: m.action_ui;
+          }
         }
+      }
     }
+  }
 }

@@ -6,15 +6,19 @@ use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
     GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
 };
-use slint::{invoke_from_event_loop, CloseRequestResponse, PlatformError};
+use slint::{
+    invoke_from_event_loop, CloseRequestResponse, ModelRc, PlatformError, SharedString, VecModel,
+};
 use std::{
     error::Error,
     io::{self, ErrorKind},
     path::PathBuf,
+    rc::Rc,
     thread,
 };
 
 slint::include_modules!();
+use slint_generatedAppWindow::Macro as UIMacro;
 
 fn main() -> Result<(), PlatformError> {
     let ui = AppWindow::new()?; //component
@@ -46,6 +50,18 @@ fn main() -> Result<(), PlatformError> {
     for m in &macros {
         println!("{} -> {}", m.keys, m.action);
     }
+
+    let ui_macros: Vec<UIMacro> = macros
+        .into_iter()
+        .map(|m| UIMacro {
+            keys_ui: m.keys.into(), //shared string
+            action_ui: m.action.into(),
+        })
+        .collect();
+
+    let macro_model: Rc<VecModel<UIMacro>> = Rc::new(VecModel::from(ui_macros));
+    let rc_macro_model = ModelRc::from(macro_model.clone());
+    ui.set_macros(rc_macro_model);
 
     wind.on_close_requested(move || {
         if let Some(w) = weak_wind.upgrade() {
