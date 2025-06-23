@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod file;
+mod window;
 
 use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
@@ -21,10 +22,12 @@ slint::include_modules!();
 use slint_generatedAppWindow::Macro as UIMacro;
 
 fn main() -> Result<(), PlatformError> {
+    slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
     let ui = AppWindow::new()?; //component
     let wind = ui.window(); //window componenet
     let weak_wind = ui.as_weak();
     let weak_wind2 = ui.as_weak();
+    let weak_wind3 = ui.as_weak();
 
     let macro_file = "macros.json";
 
@@ -101,13 +104,16 @@ fn main() -> Result<(), PlatformError> {
         }
     });
 
-    // ui.on_request_increase_value({
-    //     let ui_handle = ui.as_weak();
-    //     move || {
-    //         let ui = ui_handle.unwrap();
-    //         ui.set_counter(ui.get_counter() + 1);
-    //     }
-    // });
+    ui.show()?;
+
+    invoke_from_event_loop(move || {
+        let weak = weak_wind3.clone();
+        if let Some(component) = weak.upgrade() {
+            let host = component.window();
+            window::center_window(host);
+        }
+    })
+    .unwrap();
 
     slint::run_event_loop_until_quit()
 }

@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-slint = "1.8.0"
+slint = { version = "1.8.0", features = ["backend-winit", "renderer-femtovg"] }
+i-slint-backend-winit = "1.8.0"
 winit = "0.30"
 global-hotkey = "0.7"
 crossbeam-channel = "0.5"

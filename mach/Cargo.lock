@@ -2881,6 +2881,7 @@ dependencies = [
  "crossbeam-channel",
  "directories",
  "global-hotkey",
+ "i-slint-backend-winit",
  "serde",
  "serde_json",
  "slint",

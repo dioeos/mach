@@ -23,17 +23,10 @@ component Macro inherits Rectangle {
 
 export component AppWindow inherits Window {
 
-
-    // in property <[Macro]> macros: [
-    //   {title: "Hello", description: "World!"},
-    //   {title: "Bye", description: "World!"}
-    // ];
-
     in-out property <[Macro]> macros;
 
-
-    width: 1020px;
-    height: 900px;
+    width: 800px;
+    height: 600px;
     title: "Mach";
     in-out property<string> search_text;
     VerticalBox {
