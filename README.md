@@ -1,1 +1,1 @@
-This repository contains code for mach. This tool utilizes egui.
+Mach is a lightweight, Rust-powered macro and command GUI similar to CheatKeys.
