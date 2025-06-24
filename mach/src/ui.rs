@@ -1,20 +1,23 @@
+use crate::config::Macros;
+use slint::{ModelRc, PlatformError, VecModel};
 use std::rc::Rc;
-use slint::{PlatformError, VecModel, ModelRc};
 
 slint::include_modules!();
+use slint_generatedAppWindow::Macro as UIMacro;
 
-pub fn make_app(macros: Vec<crate::config::Macros) -> Result<slint_generatedAppWindow::AppWindow, PlatformError> {
+pub fn make_app(macros: Vec<Macros>) -> Result<slint_generatedAppWindow::AppWindow, PlatformError> {
     slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
 
     let ui = AppWindow::new()?;
     let wind = ui.window();
 
-    let ui_models = macros.into_iter()
-        .map(|m| slint_generatedAppWindow::Macro {
+    let ui_models: Vec<UIMacro> = macros
+        .into_iter()
+        .map(|m| UIMacro {
             keys_ui: m.keys.into(),
             action_ui: m.action.into(),
         })
-        .collect();
+        .collect::<Vec<UIMacro>>();
 
     let rc_macro_model = ModelRc::from(Rc::new(VecModel::from(ui_models)));
     ui.set_macros(rc_macro_model);
@@ -29,6 +32,4 @@ pub fn make_app(macros: Vec<crate::config::Macros) -> Result<slint_generatedAppW
     });
 
     Ok(ui)
-
-
 }

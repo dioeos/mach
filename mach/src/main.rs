@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod hotkey_listener;
 mod ui;
 mod window;
 
@@ -9,14 +10,13 @@ use global_hotkey::{
     GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
 };
 use slint::{invoke_from_event_loop, PlatformError};
-use std::{thread};
+use std::thread;
 
 slint::include_modules!();
 
 const MACRO_FILE: &str = "macros.json";
 
 fn main() -> Result<(), PlatformError> {
-
     let macros: Vec<config::Macros> =
         config::load_macros(MACRO_FILE).map_err(|e| PlatformError::from(e.to_string()))?;
 
@@ -26,10 +26,9 @@ fn main() -> Result<(), PlatformError> {
     let weak_wind2 = ui.as_weak();
     let weak_wind3 = ui.as_weak();
 
-    for m in &macros {
-        println!("{} -> {}", m.keys, m.action);
-    }
-
+    // for m in &macros {
+    //     println!("{} -> {}", m.keys, m.action);
+    // }
 
     let manager = GlobalHotKeyManager::new().unwrap();
     let hk = HotKey::new(Some(Modifiers::ALT), Code::Slash);
