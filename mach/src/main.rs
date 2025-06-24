@@ -1,25 +1,19 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod file;
+mod config;
 mod window;
 
 use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
     GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
 };
-use slint::{
-    invoke_from_event_loop, CloseRequestResponse, ModelRc, PlatformError, SharedString, VecModel,
-};
-use std::{
-    error::Error,
-    io::{self, ErrorKind},
-    path::PathBuf,
-    rc::Rc,
-    thread,
-};
+use slint::{invoke_from_event_loop, CloseRequestResponse, ModelRc, PlatformError, VecModel};
+use std::{rc::Rc, thread};
 
 slint::include_modules!();
 use slint_generatedAppWindow::Macro as UIMacro;
+
+const MACRO_FILE: &str = "macros.json";
 
 fn main() -> Result<(), PlatformError> {
     slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
@@ -29,26 +23,8 @@ fn main() -> Result<(), PlatformError> {
     let weak_wind2 = ui.as_weak();
     let weak_wind3 = ui.as_weak();
 
-    let macro_file = "macros.json";
-
-    let file_path: PathBuf =
-        file::get_config_file(macro_file).map_err(|e| PlatformError::from(e.to_string()))?;
-
-    let macros: Vec<file::Macros> = match file::read_macros(&file_path) {
-        Ok(m) => {
-            println!("Received");
-            m
-        }
-        Err(e) if e.kind() == ErrorKind::NotFound => {
-            println!("Not found, defaults");
-            let defaults = file::write_default_macros(&file_path)
-                .map_err(|e| PlatformError::from(e.to_string()))?;
-            defaults
-        }
-        Err(e) => {
-            return Err(PlatformError::from(format!("I/O error: {}", e)));
-        }
-    };
+    let macros: Vec<config::Macros> =
+        config::load_macros(MACRO_FILE).map_err(|e| PlatformError::from(e.to_string()))?;
 
     for m in &macros {
         println!("{} -> {}", m.keys, m.action);
