@@ -1,55 +1,35 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod ui;
 mod window;
 
 use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
     GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
 };
-use slint::{invoke_from_event_loop, CloseRequestResponse, ModelRc, PlatformError, VecModel};
-use std::{rc::Rc, thread};
+use slint::{invoke_from_event_loop, PlatformError};
+use std::{thread};
 
 slint::include_modules!();
-use slint_generatedAppWindow::Macro as UIMacro;
 
 const MACRO_FILE: &str = "macros.json";
 
 fn main() -> Result<(), PlatformError> {
-    slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
-    let ui = AppWindow::new()?; //component
-    let wind = ui.window(); //window componenet
-    let weak_wind = ui.as_weak();
-    let weak_wind2 = ui.as_weak();
-    let weak_wind3 = ui.as_weak();
 
     let macros: Vec<config::Macros> =
         config::load_macros(MACRO_FILE).map_err(|e| PlatformError::from(e.to_string()))?;
+
+    let ui = ui::make_app(macros).map_err(|e| PlatformError::from(e.to_string()))?;
+
+    let weak_wind = ui.as_weak();
+    let weak_wind2 = ui.as_weak();
+    let weak_wind3 = ui.as_weak();
 
     for m in &macros {
         println!("{} -> {}", m.keys, m.action);
     }
 
-    let ui_macros: Vec<UIMacro> = macros
-        .into_iter()
-        .map(|m| UIMacro {
-            keys_ui: m.keys.into(), //shared string
-            action_ui: m.action.into(),
-        })
-        .collect();
-
-    let macro_model: Rc<VecModel<UIMacro>> = Rc::new(VecModel::from(ui_macros));
-    let rc_macro_model = ModelRc::from(macro_model.clone());
-    ui.set_macros(rc_macro_model);
-
-    wind.on_close_requested(move || {
-        if let Some(w) = weak_wind.upgrade() {
-            let _ = w.hide();
-        }
-        println!("Hiding");
-        CloseRequestResponse::HideWindow
-    });
-    // ui.show().unwrap();
 
     let manager = GlobalHotKeyManager::new().unwrap();
     let hk = HotKey::new(Some(Modifiers::ALT), Code::Slash);
