@@ -1,11 +1,12 @@
 use crate::config::Macros;
+use slint::ComponentHandle;
 use slint::{ModelRc, PlatformError, VecModel};
 use std::rc::Rc;
 
-slint::include_modules!();
-use slint_generatedAppWindow::Macro as UIMacro;
+use crate::slint_generatedAppWindow::Macro as UIMacro;
+use crate::slint_generatedAppWindow::AppWindow;
 
-pub fn make_app(macros: Vec<Macros>) -> Result<slint_generatedAppWindow::AppWindow, PlatformError> {
+pub fn make_app(macros: Vec<Macros>) -> Result<AppWindow, PlatformError> {
     slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
 
     let ui = AppWindow::new()?;
