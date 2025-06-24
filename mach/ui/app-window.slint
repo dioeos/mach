@@ -29,11 +29,11 @@ component Macro inherits Rectangle {
 export component AppWindow inherits Window {
 
     in-out property <[Macro]> macros;
-
+    in-out property<string> search_text;
+    callback search_text_changed(string); 
     width: 1200px;
     height: 600px;
     title: "Mach";
-    in-out property<string> search_text;
     VerticalBox {
       width: parent.width;
       height: parent.height;
@@ -48,7 +48,10 @@ export component AppWindow inherits Window {
             text <=> root.search_text;
             placeholder-text: "Filter";
             width: 1000px;
-            
+            //trigger callback when text property changes
+            changed text => {
+              search_text_changed(self.text)
+            }
           }
         }
       }
