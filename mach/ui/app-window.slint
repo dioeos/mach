@@ -11,12 +11,17 @@ component Macro inherits Rectangle {
   // background: #f0f0f0;
 
   Rectangle {
+    // background: #00FF00;
     width: parent.width;
     height: parent.height;
     Text {
+      width: parent.width - 16px;
+      height: parent.height;
       text: root.text + " - " + root.description;
-      horizontal-alignment: center;
+      horizontal-alignment: left;
       vertical-alignment: center;
+      wrap: no-wrap;
+      overflow: elide;
     }
   }
 }
@@ -25,37 +30,47 @@ export component AppWindow inherits Window {
 
     in-out property <[Macro]> macros;
 
-    width: 800px;
+    width: 1200px;
     height: 600px;
     title: "Mach";
     in-out property<string> search_text;
     VerticalBox {
       width: parent.width;
       height: parent.height;
-      spacing: 8px;
-      padding: 8px;
-      LineEdit {
-        text <=> root.search_text;
-        placeholder-text: "Filter";
-        width: parent.width;
-      }
-      ScrollView {
-        width: parent.width;
-        height: parent.height;
-        Rectangle {
-          VerticalBox {
+
+      Rectangle {
+        // background: #FF0000;
+        height: 40px;
+        HorizontalBox {
           width: parent.width;
-          height: 74px * ceil(root.macros.length / 4);
-          for m[i] in root.macros : Macro {
-            x: mod(i, 4) * 74px;
-            // y: floor(i /4) * 74px;
-            width: 64px;
-            height: 64px;
-            text: m.keys_ui;
-            description: m.action_ui;
+          alignment: center;
+          LineEdit {
+            text <=> root.search_text;
+            placeholder-text: "Filter";
+            width: 1000px;
+            
           }
         }
       }
-    }
+
+      Rectangle {
+        width: parent.width;
+        height: parent.height;
+        Rectangle {
+          padding: 20px;
+          ListView {
+            width: parent.width;
+            // height: 74px * ceil(root.macros.length / 4);
+            for m[i] in root.macros : Macro {
+              // x: mod(i, 4) * 74px;
+              // y: floor(i /4) * 74px;
+              height: 20px;
+              text: m.keys_ui;
+              description: m.action_ui;
+            }
+          }
+        }
+      }
+
   }
 }
