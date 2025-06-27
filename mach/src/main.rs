@@ -2,6 +2,7 @@
 
 mod config;
 mod hotkey_listener;
+mod search;
 mod ui;
 mod window;
 
@@ -20,7 +21,7 @@ fn main() -> Result<(), PlatformError> {
 
     app_ui.show()?;
 
-    let manager = hotkey_listener::spawn_hotkey_listener(app_ui.as_weak()); //ensures manager lifetime 
+    let manager = hotkey_listener::spawn_hotkey_listener(app_ui.as_weak()); //ensures manager lifetime
 
     invoke_from_event_loop(move || {
         let weak = weak_wind2.clone();

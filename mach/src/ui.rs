@@ -1,5 +1,7 @@
 use crate::config::Macros;
-use slint::{ComponentHandle, FilterModel};
+use crate::search::{self, fuzzy_search};
+use fuzzy_matcher::skim::SkimMatcherV2;
+use slint::{ComponentHandle, FilterModel, SharedString};
 use slint::{ModelRc, PlatformError, VecModel};
 use std::rc::Rc;
 
@@ -20,27 +22,35 @@ pub fn make_app(macros: Vec<Macros>) -> Result<AppWindow, PlatformError> {
         })
         .collect::<Vec<UIMacro>>();
 
-    let rc_macro_model = ModelRc::from(Rc::new(VecModel::from(ui_macros)));
+    let rc_all_macros = Rc::new(ui_macros.clone());
+    let rc_vec_model = Rc::new(VecModel::from(ui_macros));
+    let vec_model_for_closure = rc_vec_model.clone();
+    let rc_macro_model = ModelRc::from(rc_vec_model);
+    ui.set_macros(rc_macro_model);
 
-    let weak_ui_for_filter = ui.as_weak();
+    let matcher = SkimMatcherV2::default();
 
-    let raw_filtered_model = Rc::new(FilterModel::new(
-        rc_macro_model.clone(),
-        move |ui_macro: &UIMacro| {
-            if let Some(w) = weak_ui_for_filter.upgrade() {
-                let query = w.get_search_text().to_lowercase();
-                ui_macro.keys_ui.to_lowercase().contains(&query)
-                    || ui_macro.action_ui.to_lowercase().contains(&query)
-            } else {
-                true
+    let weak_ui = ui.as_weak();
+    let all_macros_for_closure = rc_all_macros.clone();
+    ui.on_search_text_changed(move |_text| {
+        if let Some(w) = weak_ui.upgrade() {
+            let query = w.get_search_text().to_lowercase();
+
+            let candidate_keys: Vec<SharedString> = all_macros_for_closure
+                .iter()
+                .map(|m| m.action_ui.clone())
+                .collect();
+
+            let top_keys: Vec<&SharedString> = fuzzy_search(&matcher, &query, &candidate_keys, 5);
+
+            vec_model_for_closure.clear();
+            for key in top_keys {
+                if let Some(m) = all_macros_for_closure.iter().find(|m| m.action_ui == key) {
+                    vec_model_for_closure.push(m.clone());
+                }
             }
-        },
-    ));
-
-    let filtered_model = ModelRc::from(raw_filtered_model.clone());
-
-    ui.set_macros(filtered_model.clone());
-    ui.on_search_text_changed(move |_text| raw_filtered_model.reset());
+        }
+    });
 
     let weak = ui.as_weak();
     wind.on_close_requested(move || {
