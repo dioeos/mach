@@ -36,6 +36,14 @@ pub fn make_app(macros: Vec<Macros>) -> Result<AppWindow, PlatformError> {
         if let Some(w) = weak_ui.upgrade() {
             let query = w.get_search_text().to_lowercase();
 
+            if query.trim().is_empty() {
+                vec_model_for_closure.clear();
+                for m in all_macros_for_closure.iter() {
+                    vec_model_for_closure.push(m.clone());
+                }
+                return;
+            }
+
             let candidate_keys: Vec<SharedString> = all_macros_for_closure
                 .iter()
                 .map(|m| m.action_ui.clone())

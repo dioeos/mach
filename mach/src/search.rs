@@ -4,9 +4,6 @@ use slint::SharedString;
 
 pub fn fuzzy_search<'a>(matcher: &SkimMatcherV2, user_query: &str, macro_candidates: &'a [SharedString], top_n: usize) -> Vec<&'a SharedString> {
 
-    if user_query.trim().is_empty() {
-        return macro_candidates.iter().take(top_n).collect::<Vec<&SharedString>>();
-    }
 
     let mut scored: Vec<(&SharedString, i64)> = macro_candidates
         .iter()
