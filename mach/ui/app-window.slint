@@ -27,6 +27,7 @@ component Macro inherits Rectangle {
 }
 
 export component AppWindow inherits Window {
+    forward-focus: input;
 
     in-out property <[Macro]> macros;
     in-out property<string> search_text;
@@ -44,7 +45,7 @@ export component AppWindow inherits Window {
         HorizontalBox {
           width: parent.width;
           alignment: center;
-          LineEdit {
+          input := LineEdit {
             text <=> root.search_text;
             placeholder-text: "Filter";
             width: 1000px;

@@ -1,7 +1,7 @@
 use crate::config::Macros;
-use crate::search::{self, fuzzy_search};
+use crate::search::fuzzy_search;
 use fuzzy_matcher::skim::SkimMatcherV2;
-use slint::{ComponentHandle, FilterModel, SharedString};
+use slint::{ComponentHandle, SharedString};
 use slint::{ModelRc, PlatformError, VecModel};
 use std::rc::Rc;
 
