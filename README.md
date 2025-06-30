@@ -9,3 +9,10 @@
 ## Demo
 
 https://github.com/user-attachments/assets/9d1562a2-78e0-4d8e-b136-02ec7f858263
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+[![Made with Slint](https://raw.githubusercontent.com/slint-ui/slint/master/logo/MadeWithSlint-logo-whitebg.png)](https://slint.dev)
+This project uses the [Slint UI toolkit](https://slint.dev), licensed under the [Slint Royalty-Free Desktop, Mobile, and Web Applications License](https://slint.dev/terms-and-conditions#royalty-free).
