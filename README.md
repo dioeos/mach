@@ -28,7 +28,8 @@ The JSON file that Mach reads to display your macros and commands can be found a
 - Windows: `%APPDATA%\mach\config\macros.json`
 - macOS: `~Library/Application Support/mach/config/macros.json`
 - Linux: `~/.config/mach/config/macros.json`
-  By default the file contains the following content:
+<br>
+By default the file contains the following content:
 
 ```
 [
