@@ -2,7 +2,8 @@
 
 **M**acro **A**nd **C**ommand **H**elper is a lightweight, cross-platform Rust-powered application that lets you trigger an overlay via a global hotkey to display your user-defined macros and commands from a JSON file.
 
-> [!WARNING] > **Why MACH?** MACH exists for a simple reason: to stop you from constantly Googling or forgetting needed commands and macros.  
+> [!WARNING]
+> **Why MACH?** MACH exists for a simple reason: to stop you from constantly Googling or forgetting needed commands and macros.  
 > Whether it's using a CLI command, executing some VS Code keybinding, or just running that one obscure script you can never remember, MACH keeps all your important commands and macros just one hotkey away...
 
 ## Demo
@@ -28,7 +29,8 @@ The JSON file that Mach reads to display your macros and commands can be found a
 - Windows: `%APPDATA%\mach\config\macros.json`
 - macOS: `~Library/Application Support/mach/config/macros.json`
 - Linux: `~/.config/mach/config/macros.json`
-  By default the file contains the following content:
+<br>
+By default the file contains the following content:
 
 ```
 [
