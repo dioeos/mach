@@ -9,7 +9,7 @@ use crate::slint_generatedAppWindow::AppWindow;
 use crate::slint_generatedAppWindow::Macro as UIMacro;
 
 pub fn make_app(macros: Vec<Macros>) -> Result<AppWindow, PlatformError> {
-    slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
+    let _ = slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
 
     let ui = AppWindow::new()?;
     let wind = ui.window();

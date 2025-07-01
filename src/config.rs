@@ -1,12 +1,12 @@
 use std::{
-    fs, io::{self, ErrorKind},
-    path::{PathBuf},
+    fs,
+    io::{self, ErrorKind},
+    path::PathBuf,
 };
 
 use serde::{Deserialize, Serialize};
 
 use directories::ProjectDirs;
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Macros {
@@ -24,10 +24,7 @@ pub fn load_macros(file_name: &str) -> io::Result<Vec<Macros>> {
     //gets file, read, handles error
     let file_path: PathBuf = get_config_file(file_name)?;
     match read_macros(&file_path) {
-        Ok(json_macros) => {
-            println!("Read JSON Macros");
-            Ok(json_macros)
-        }
+        Ok(json_macros) => Ok(json_macros),
         Err(e) if e.kind() == ErrorKind::NotFound => {
             println!("File not found, making defaults");
             let defaults = define_default_macros();
@@ -64,7 +61,8 @@ fn get_config_file(file_name: &str) -> io::Result<PathBuf> {
 }
 
 fn write_macros(path: &PathBuf, macros: &[Macros]) -> io::Result<()> {
-    let json_content = serde_json::to_string_pretty(macros).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+    let json_content = serde_json::to_string_pretty(macros)
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
     fs::write(path, json_content)
 }
 
@@ -72,6 +70,6 @@ fn define_default_macros() -> Vec<Macros> {
     vec![
         Macros::new("Alt + /".into(), "Open MACH".into()),
         Macros::new("Alt + /".into(), "Hide MACH".into()),
-        Macros::new("Ctrl+N".into(), "New browser tab".into())
+        Macros::new("Ctrl+N".into(), "New browser tab".into()),
     ]
 }

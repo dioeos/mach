@@ -1,4 +1,4 @@
-use std::{path::PathBuf, process::{Child, Command}, thread};
+use std::{process::{Child, Command}, thread};
 
 use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},

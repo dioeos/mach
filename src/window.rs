@@ -5,7 +5,6 @@ use i_slint_backend_winit::winit::window::WindowLevel;
 use i_slint_backend_winit::WinitWindowAccessor;
 
 pub fn center_window(window: &slint::Window) {
-    println!("Called center window");
     if window.has_winit_window() {
         window.with_winit_window(|window: &Window| {
             if let Some(monitor) = window.current_monitor() {
