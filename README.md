@@ -10,6 +10,15 @@
 
 https://github.com/user-attachments/assets/9d1562a2-78e0-4d8e-b136-02ec7f858263
 
+## Installation
+**Step 1:** Ensure you have [Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) installed on your system. If you already have this, skip to the next step.
+
+**Step 2:** You can install the application using `cargo`:
+```
+cargo install mach-keys
+```
+Once installed, you can run the application from anywhere.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
