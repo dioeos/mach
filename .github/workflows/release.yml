@@ -5,12 +5,14 @@ on:
     types: [created]
 
 jobs:
-  publish:
+  build:
+    name: Check Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
+  publish:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Rust
