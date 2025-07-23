@@ -1,4 +1,7 @@
-use std::{process::{Child, Command}, thread};
+use std::{
+    process::{Child, Command},
+    thread,
+};
 
 use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
@@ -8,7 +11,9 @@ use slint::{invoke_from_event_loop, ComponentHandle};
 
 use crate::slint_generatedAppWindow;
 
-pub fn spawn_hotkey_listener(weak_window: slint::Weak<slint_generatedAppWindow::AppWindow>) -> GlobalHotKeyManager {
+pub fn spawn_hotkey_listener(
+    weak_window: slint::Weak<slint_generatedAppWindow::AppWindow>,
+) -> GlobalHotKeyManager {
     let manager = GlobalHotKeyManager::new().expect("Failed to initialize HotKey Manager");
     let alt_slash_hk = HotKey::new(Some(Modifiers::ALT), Code::Slash);
     let alt_comma_hk = HotKey::new(Some(Modifiers::ALT), Code::Comma);
@@ -24,14 +29,17 @@ pub fn spawn_hotkey_listener(weak_window: slint::Weak<slint_generatedAppWindow::
 
     thread::spawn(move || {
         for event in rx {
-            if event.state() != HotKeyState::Pressed { continue; }
+            if event.state() != HotKeyState::Pressed {
+                continue;
+            }
 
             if event.id() == alt_comma_hk_id {
                 invoke_from_event_loop(move || {
                     if let Err(err) = open_editor("C:/Windows/System32/notepad.exe") {
                         println!("Editor Error: {}", err);
                     }
-                }).unwrap();
+                })
+                .unwrap();
             }
 
             if event.id() == alt_slash_hk_id {
@@ -39,7 +47,6 @@ pub fn spawn_hotkey_listener(weak_window: slint::Weak<slint_generatedAppWindow::
                 invoke_from_event_loop(move || toggle_window(&weak)).unwrap();
             }
         }
-
     });
 
     manager
@@ -48,9 +55,12 @@ pub fn spawn_hotkey_listener(weak_window: slint::Weak<slint_generatedAppWindow::
 fn toggle_window(weak_window: &slint::Weak<slint_generatedAppWindow::AppWindow>) {
     if let Some(component) = weak_window.upgrade() {
         let host = component.window();
-        if host.is_visible() { host.hide().unwrap(); } else { host.show().unwrap(); }
+        if host.is_visible() {
+            host.hide().unwrap();
+        } else {
+            host.show().unwrap();
+        }
     }
-
 }
 
 fn open_editor(editor_path: &str) -> Result<Child, std::io::Error> {
@@ -66,6 +76,6 @@ fn open_editor(editor_path: &str) -> Result<Child, std::io::Error> {
             };
             fallback.spawn()
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
