@@ -36,6 +36,9 @@ jobs:
           profile: minimal
           toolchain: stable
 
+      - name: Check Lockfile Status
+        run: cargo generate-lockfile --locked
+
       - name: Run cargo test
         run: cargo test
 
