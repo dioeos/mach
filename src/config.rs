@@ -26,7 +26,6 @@ pub fn load_macros(file_name: &str) -> io::Result<Vec<Macros>> {
     match read_macros(&file_path) {
         Ok(json_macros) => Ok(json_macros),
         Err(e) if e.kind() == ErrorKind::NotFound => {
-            println!("File not found, making defaults");
             let defaults = define_default_macros();
             write_macros(&file_path, &defaults)?;
             Ok(defaults)
@@ -57,7 +56,7 @@ fn get_config_file(file_name: &str) -> io::Result<PathBuf> {
     let config_dir = proj.config_dir();
     fs::create_dir_all(config_dir)?;
 
-    Ok(config_dir.join(format!("{}", file_name)))
+    Ok(config_dir.join(file_name))
 }
 
 fn write_macros(path: &PathBuf, macros: &[Macros]) -> io::Result<()> {
