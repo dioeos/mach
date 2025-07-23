@@ -36,6 +36,7 @@ pub fn spawn_hotkey_listener(
             if event.id() == alt_comma_hk_id {
                 invoke_from_event_loop(move || {
                     if let Err(_err) = open_editor("C:/Windows/System32/notepad.exe") {
+                        // Adding Error
                     }
                 })
                 .unwrap();
