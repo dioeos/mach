@@ -1,6 +1,6 @@
 [package]
 name = "mach-keys"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Ryan Dioneda"]
 description = "A simple cross-platform Macro and Command GUI Helper"
